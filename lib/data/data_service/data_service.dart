@@ -1,35 +1,24 @@
-import 'dart:convert';
 import 'package:authentication_bloc_mvvm/common/resources/urls.dart';
-import 'package:http/http.dart' as http;
+import 'package:authentication_bloc_mvvm/services/http_services.dart';
 
-import '../models/api_response_model/api_response_model.dart';
+import '../models/api_request_model/sign_in_model.dart';
 
-abstract class AutDataService {
-  Future<LoginResponseModel> login(String email, String password);
-}
+class AuthDataService {
+  static Future login({required SignInModel signInModel}) async {
+    final DataService dataService = DataService(Urls.baseUrl);
 
+    final Map<String, dynamic> data = <String, dynamic>{
+      'email': signInModel.email,
+      'password': signInModel.password,
+    };
 
-class AuthService implements AutDataService {
-  final http.Client client;
+    var headers = {
+      'default_language': 'en',
+      'Content-Type': 'application/json',
+    };
 
-  AuthService({
-    http.Client? client,
-  }) : client = client ?? http.Client();
-
-  @override
-  Future<LoginResponseModel> login(String email, String password) async {
-    String baseUrl = '${Urls.baseUrl}${Urls.login}';
-    final response = await client.post(
-      Uri.parse(baseUrl),
-      headers: {'default_language': 'en','Content-Type': 'application/json'},
-      body: jsonEncode({'email': email, 'password': password}),
-    );
-
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
-      return LoginResponseModel.fromJson(jsonResponse);
-    } else {
-      throw Exception('Failed to login');
-    }
+    final response =
+        await dataService.post(Urls.login, body: data, headers: headers);
+    return response;
   }
 }

@@ -1,14 +1,12 @@
-import 'package:authentication_bloc_mvvm/common/resources/app_strings.dart';
+import 'package:authentication_bloc_mvvm/data/models/api_request_model/sign_in_model.dart';
+import 'package:authentication_bloc_mvvm/data/repository/repository.dart';
 import 'package:authentication_bloc_mvvm/presentation/authentication/bloc/authentication_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../common/functions/text_feild_validation.dart';
-import '../../../data/data_service/data_service.dart';
 import '../../../data/models/api_response_model/api_response_model.dart';
-import '../../../di/di.dart';
 
 
-final AuthService _authService = instance<AuthService>();
 
 void handlePasswordVisibility({
   required TriggerPasswordVisibility event,
@@ -82,13 +80,15 @@ Future<void> handleSignInEvent({
   // String validationMessage = validateCredentials(email, password);
 
   try {
-    final LoginResponseModel response = await _authService.login(email, password);
+    final LoginResponseModel? response = await AuthRepository.login(
+       signInModel: SignInModel(email: email, password: password),
+    );
 
     // Emit success state
     emit(state.copyWith(
       isLoading: false,
       isFailure: false,
-      message: response.message.toString(),
+      message: response!.message.toString(),
     ));
   } catch (e) {
     // Emit failure state
