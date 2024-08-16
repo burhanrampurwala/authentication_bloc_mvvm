@@ -117,6 +117,7 @@ class _SignInViewState extends State<SignInView> {
                         style: AppStyles().elevatedWhiteBtnRoundedStyle,
                         onPressed: () async {
                           if (_signInBloc.formKey.currentState!.validate()) {
+                            FocusManager.instance.primaryFocus?.unfocus();
                             _signInBloc.add(
                               TriggerOnPressedButton(
                                 signInModel: SignInModel(
